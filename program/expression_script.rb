@@ -10,10 +10,10 @@
 # 全般
 #
 
-# irb　--simple-promptの後ろにファイルネームを置いて実行する。
+# irb --simple-promptの後ろにファイルネームを置いて実行する。
 # Rubyのモンキーパッチ機能のおかげで対話的にクラスを拡張できるため、
-#　テキストに沿って、対話的に記述する。
-#　このファイルを読み込めば、続きから始められる。
+# テキストに沿って、対話的に記述する。
+# このファイルを読み込めば、続きから始められる。
 # Rubyでは、関数名(変数)の、関数名と(を離すことはできない。
 # 物事を簡単にするため、共通コードを抽出したくなるのを我慢しよう。
 # 実習の性質上、ペアプログラミングが有効かもしれない。くだらないミスを防げる。
@@ -57,7 +57,7 @@ end
 
 #
 # これをインスタンス化し、抽象構文木(式を構造的に表現したもの）を構築
-# これにより、1 * 2 + 3 * 4　という式ができる。（まだ計算はできない）
+# これにより、1 * 2 + 3 * 4 という式ができる。（まだ計算はできない）
 #
 Add.new(
 	Multiply.new(Number.new(1), Number.new(2)),
@@ -74,7 +74,7 @@ Add.new(
 
 # 数クラスにメソッド追加
 class Number
-	
+
 	# selfにアクセスすると、to_sが自動的に呼び出される。
 	# 値そのものを返す
 	def to_s
@@ -142,7 +142,7 @@ Add.new(
 # 最終的に出てくる式の全体に<<>>が付く
 # irbによる表示⇒inspectメソッド
 # オブジェクトの参照⇒to_sメソッド
-#　irbで呼び出してるのは一番外側のオブジェクトだけ
+# irbで呼び出してるのは一番外側のオブジェクトだけ
 Number.new(5)
 
 
@@ -154,8 +154,8 @@ Number.new(5)
 # 意味論の説明にはあまり関係ないので、「3.3.1構文」でその問題を取り扱う。
 #
 
-# 1 * ( (2 + 3) * 4) (= 20)　という計算をしたいが、　
-# 1 * 2 + 3 * 4　(= 14) と表示されてしまう。
+# 1 * ( (2 + 3) * 4) (= 20) という計算をしたいが、
+# 1 * 2 + 3 * 4 (= 14) と表示されてしまう。
 # これに関しては話を簡単にするため一時的に無視する。
 Multiply.new(
 	Number.new(1),
@@ -171,7 +171,7 @@ Multiply.new(
 
 #
 # 式を作ることができたので、簡約を行うメソッドを、各クラスに追加（モンキーパッチング）したい。
-# 簡約とは、例えば　1 + 1 を　2　に変えること。　式が短くなる⇒簡約
+# 簡約とは、例えば 1 + 1 を 2 に変えること。 式が短くなる⇒簡約
 # その準備として、各要素が簡約可能かどうかを返すメソッドを追加する。
 #
 
@@ -207,7 +207,7 @@ end
 # 1 簡約不可
 Number.new(1).reducible?
 
-# 1 + 2　簡約可能
+# 1 + 2 簡約可能
 Add.new(Number.new(1), Number.new(2)).reducible?
 
 
@@ -220,7 +220,7 @@ Add.new(Number.new(1), Number.new(2)).reducible?
 #
 
 # 左優先で簡約していく。
-#　左右とも簡約できなければ、数値が渡されているので、足し算して返す。
+# 左右とも簡約できなければ、数値が渡されているので、足し算して返す。
 class Add
 	def reduce
 		if left.reducible?
@@ -236,7 +236,7 @@ end
 
 
 # 左優先で簡約していく。
-#　左右とも簡約できなければ、数値が渡されているので、掛け算して返す。
+# 左右とも簡約できなければ、数値が渡されているので、掛け算して返す。
 class Multiply
 	def reduce
 		if left.reducible?
@@ -250,7 +250,7 @@ class Multiply
 end
 
 # なぜnewなのかというと、reduceは式を変更しているのではなく、実際は新しい式を作っているから。
-# !　オブジェクト指向的には、こういう長いif,elseをどうやって捌くのだろう？
+# ! オブジェクト指向的には、こういう長いif,elseをどうやって捌くのだろう？
 
 
 
@@ -261,7 +261,7 @@ end
 # reduceを1回行うごとに、式が簡約されていき、すごくスモールステップらしい。
 #
 
-# 最初の式を作る。　1 * 2 + 3 * 4
+# 最初の式を作る。 1 * 2 + 3 * 4
 expression = Add.new(
 	Multiply.new(Number.new(1), Number.new(2)),
 	Multiply.new(Number.new(3), Number.new(4))
@@ -294,7 +294,7 @@ expression.reducible?
 
 # 式オブジェクトを渡すと簡約し続ける
 class Machine < Struct.new(:expression)
-	
+
 	# 簡約を1ステップ進める
 	def step
 		self.expression = expression.reduce
@@ -372,7 +372,7 @@ class LessThan < Struct.new(:left, :right)
 		"<<#{self}>>"
 	end
 
-	#　小なりは、不等式が正しいかを判定し、真理値を返す。
+	# 小なりは、不等式が正しいかを判定し、真理値を返す。
 	def reducible?
 		true
 	end
@@ -420,7 +420,7 @@ Machine.new(
 # 変数を表現するクラスを定義する。
 # 変数の名前を属性に持つ。
 class Variable < Struct.new(:name)
-	
+
 	# 変数名を返す
 	def to_s
 		name.to_s
@@ -432,7 +432,7 @@ class Variable < Struct.new(:name)
 	end
 
 	# 変数における簡約とは、変数を、変数名に対応する値に置き換えること。
-	# x = 5 となっていたら、　x + 3 を　5 + 3　に簡約する作業。
+	# x = 5 となっていたら、 x + 3 を 5 + 3 に簡約する作業。
 	def reducible?
 		true
 	end
@@ -476,9 +476,9 @@ end
 class Multiply
 	def reduce(environment)
 		if left.reducible?
-			Add.new(left.reduce(environment), right)
+			Multiply.new(left.reduce(environment), right)
 		elsif right.reducible?
-			Add.new(left, right.reduce(environment))
+			Multiply.new(left, right.reduce(environment))
 		else
 			Number.new(left.value * right.value)
 		end
@@ -491,9 +491,9 @@ end
 class LessThan
 	def reduce(environment)
 		if left.reducible?
-			Add.new(left.reduce(environment), right)
+			LessThan.new(left.reduce(environment), right)
 		elsif right.reducible?
-			Add.new(left, right.reduce(environment))
+			LessThan.new(left, right.reduce(environment))
 		else
 			Boolean.new(left.value < right.value)
 		end
@@ -512,9 +512,9 @@ Object.send(:remove_const, :Machine)
 
 
 
-#　environment引数を追加し、作り直す
+# environment引数を追加し、作り直す
 class Machine < Struct.new(:expression, :environment)
-	
+
 	#簡約を1ステップ進める。
 	#
 	def step
@@ -542,15 +542,15 @@ end
 
 Machine.new(
 
-	#　式、x + y　という変数を使えるようになった。　Machineの第1引数
+	# 式、x + y という変数を使えるようになった。 Machineの第1引数
 	Add.new(Variable.new(:x), Variable.new(:y)),
 
-	#　これがハッシュ。Machineの第2引数
+	# これがハッシュ。Machineの第2引数
 	{x: Number.new(3), y: Number.new(4)}
 ).run
 
 # 全ての変数には、対応する値がなければ、計算は終了しない。
-# 例えば、yが定義されていないとき、3 + y　で終わったりしない。
+# 例えば、yが定義されていないとき、3 + y で終わったりしない。
 # 対応する値のない変数がある式が正常に終了する方が危険。
 
 
