@@ -1,3 +1,5 @@
+# ビッグステップ意味論 #
+
 require "./statement_script.rb"
 
 # スモールステップ意味論:仮想マシンは繰り返し簡約ステップすることが必要
@@ -81,11 +83,11 @@ end
 
 
 Number.new(23).evaluate({})
-Variable.new(:x).evaluate({:x Number.new(23) })
+Variable.new(:x).evaluate({ x: Number.new(23) })
 LessThan.new(
- Add.new(Variable.new(:x),Number.new(2)),
- Variable.new(:y)
-).avaluate({ x: Number.new(2), y: Number.new(5) })
+  Add.new(Variable.new(:x),Number.new(2)),
+  Variable.new(:y)
+).evaluate({ x: Number.new(2), y: Number.new(5) })
 
 
 # 文
@@ -137,8 +139,8 @@ end
 
 statement =
 Sequence.new(
- Assign.new(:x, Add.new(Number.new(1), Number.new(1))),
- Assign.new(:y, Add.new(Variable.new(:x), Number.new(3)))
+  Assign.new(:x, Add.new(Number.new(1), Number.new(1))),
+  Assign.new(:y, Add.new(Variable.new(:x), Number.new(3)))
 )
 
 statement.evaluate({})
@@ -168,8 +170,8 @@ end
 
 statement =
 While.new(
- LessThan.new(Variable.new(:x), Number.new(5)),
- Assign.new(:x, Multiply.new(Variable.new(:x), Number.new(3)))
+  LessThan.new(Variable.new(:x), Number.new(5)),
+  Assign.new(:x, Multiply.new(Variable.new(:x), Number.new(3)))
 )
 
 statement.evaluate({ x: Number.new(1) })
