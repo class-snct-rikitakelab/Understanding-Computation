@@ -220,3 +220,102 @@ proc.call( environment )
 # Rubyで数学的オブジェクトと環境を対応させられるようになった
 # 合成性を持った3つの式をRubyで数学的オブジェクトとして計算できるようになった。
 #
+
+
+# 文
+# 操作的意味論では文は新しい値というより新しい環境を作るものだった
+# →表示的意味論で実現しよう
+#
+# Assignのto_rubyメソッドは更新された環境のハッシュが結果となるprocを作る必要
+
+class Assign
+        def to_ruby
+                "-> e { e.merge({ #{name.inspect} => (#{expression.to_ruby}).call(e) }) }"
+        end
+end
+
+# Assignの確認
+statement = Assign.new(:y, Add.new(Variable.new(:x), Number.new(1)))
+# => ≪y = x + 1≫
+
+statement.to_ruby
+# => "-> e { e.merge({ :y => (-> e { (-> e { e[:x] }).call(e) + (-> e { 1 }).call(e) }).call(e) }) }"
+
+proc = eval(statement.to_ruby)
+# => #<Proc:0x007f039ce5aaf0@(eval):1 (lambda)>
+
+# x=3の環境を与えてやる
+proc.call({ x: 3 })
+# => {:x=>3, :y=>4}
+
+
+
+
+# DoNothingはここでも簡単
+
+class DoNothing
+        def to_ruby
+                '-> e { e }'
+        end
+end
+
+
+
+
+# if文では
+# ≪if(...) {...} else(...) {...}≫をRubyのif ... then ... else ... end
+# の形に翻訳する。
+#
+class If
+        def to_ruby
+                "-> e { if (#{condition.to_ruby}).call(e)" +
+                " then (#{consequence.to_ruby}).call(e)" +
+                " else (#{alternative.to_ruby}).call(e)" +
+                " end }"
+        end
+end
+
+
+
+
+# ビッグステップ意味論ではシーケンス分は
+# 一つ目の文の評価結果が二つ目の文の評価のための環境として
+# 使われてたのでそのように
+class Sequence
+        def to_ruby
+                "-> e { (#{second.to_ruby}).call((#{first.to_ruby}).call(e)) }"
+        end
+end
+
+
+
+
+# while文をRubyのwhileを使ったprocに翻訳する。
+# これは再帰的にbodyを実行して最終的な環境を返す。
+class While
+        def to_ruby
+                "-> e {" +
+                " while (#{condition.to_ruby}).call(e); e = (#{body.to_ruby}).call(e); end;" +
+                " e" +
+                " }"
+        end
+end
+
+
+
+# 簡単なwhile文も非常にくどくなることを確かめる
+statement =
+While.new(
+LessThan.new(Variable.new(:x), Number.new(5)),
+Assign.new(:x, Multiply.new(Variable.new(:x), Number.new(3)))
+)
+# => ≪while (x < 5) { x = x * 3 }≫
+
+statement.to_ruby
+# => "-> e { while (-> e { ( -> e { e[ :x ] } ).call(e) < ( -> e { 5 } ).call(e) }).call(e); e = (-> e { e.merge({ :x => (-> e { ( -> e { e[ :x ] } ).call(e) * ( -> e { 3 } ).call(e) }).call(e) }) }).call(e); en
+
+proc = eval(statement.to_ruby)
+# => #<Proc:0x007fe457af4040@(eval):1 (lambda)>
+
+proc.call({ x: 1 })
+# => {:x=>9}
