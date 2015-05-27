@@ -236,6 +236,7 @@ end
 
 # Assignの確認
 statement = Assign.new(:y, Add.new(Variable.new(:x), Number.new(1)))
+
 # => ≪y = x + 1≫
 
 statement.to_ruby
