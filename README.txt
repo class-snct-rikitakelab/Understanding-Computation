@@ -9,3 +9,8 @@ program:作成したプログラムを入れてください。
 Just Enough Ruby:Rubyひとまわりのメモです。原本の方が理解しやすいかと
 
 何かあったらこのファイルに書いてください。
+
+./program/expression_script.rb:スモールステップ意味論の式について
+./program/statement_script.rb:スモールステップ意味論の文について
+./program/big_step_script.rb:ビッグステップ意味論について
+./program/denotational_semantics_script.rb:表示的意味論について
