@@ -64,6 +64,7 @@ class Literal < Struct.new(:character)			#単独の文字を実装
 end
 
 #	2つのpattern
+
 #		・Concatenate：　文字を連結する。
 #			例) "a"と"b"を連結して"ab"
 #		・Choose：　二つのpatternのどちらかを選択する。
@@ -71,38 +72,52 @@ end
 #		・Repeat：　0回以上の繰り返し
 #			例）a* なら，""，"a"，"aa"，…の時に真を返す。
 
-class Concatenate < Struct.new(:first, :second)						#文字の連接の表現を実装
+#文字の連接の表現を実装
+class Concatenate < Struct.new(:first, :second)	
+
 	include Pattern
 
 	def to_s
-		[first, second].map { |pattern| pattern.bracket(precedence) }.join	#各要素がカッコで囲まれるべきかどうかを判定
-	end										#その後，joinメソッドで連結する．
+		#各要素がカッコで囲まれるべきかどうかを判定
+		#その後，joinメソッドで連結する．
+		[first, second].map { |pattern| pattern.bracket(precedence) }.join	
+	end						
 
-	def precedence									#連接の優先度は1
+	def precedence
+		#連接の優先度は1
 		1
 	end
 end
 
-class Choose < Struct.new(:first, :second)						#選択の表現を実装
+#選択の表現を実装
+class Choose < Struct.new(:first, :second)		
+
 	include Pattern
 
 	def to_s
-		[first, second].map { |pattern| pattern.bracket(precedence) }.join('|')	#各要素がカッコで囲まれるべきかどうかを判定
-	end										#その後，joinメソッドで連結する
+		#各要素がカッコで囲まれるべきかどうかを判定
+		#その後，joinメソッドで連結する
+		[first, second].map { |pattern| pattern.bracket(precedence) }.join('|')	
+	end										
 
-	def precedence									#選択の優先度は0
+	def precedence
+		#選択の優先度は0									
 		0
 	end	
 end
 
-class Repeat < Struct.new(:pattern)							#繰り返しの表現を実装
+#繰り返しの表現を実装
+class Repeat < Struct.new(:pattern)							
 	include Pattern
 
 	def to_s			
-		pattern.bracket(precedence) + '*'					#各要素がカッコで囲まれるべきかどうかを判定
-	end										#その後，末尾に演算子を付加 (Literalの時のみカッコなしで演算子をつける)
+		#各要素がカッコで囲まれるべきかどうかを判定
+		#その後，末尾に演算子を付加 
+		pattern.bracket(precedence) + '*'					
+	end										
 
-	def precedence									#繰り返しの優先度は2
+	def precedence									
+		#繰り返しの優先度は2
 		2
 	end
 end
@@ -123,29 +138,35 @@ pattern = Repeat.new(
 #	だが書き方を定義しただけで，意味は定義できていない。
 #	ここからは表現に意味を付け加えていく
 
-class Empty									#空の正規表現にNFAの規則を付加
+#空の正規表現にNFAの規則を付加
+class Empty			
+	#開始ステート，受理ステート，NFAの規則を定義していくことで意味づけをしていく						
 	def to_nfa_design
-		start_state = Object.new					#開始ステート，受理ステート，NFAの規則を定義していくことで意味づけをしていく
+		start_state = Object.new
 		accept_states = [start_state]
 		rulebook = NFARulebook.new([])
 
-		NFADesign.new(start_state, accept_states, rulebook)		#ルールもなく無条件に真を返す．
+		#空：ルールもなく無条件に真を返す．
+		NFADesign.new(start_state, accept_states, rulebook)
 	end
 end
 
 class Literal
 	def to_nfa_design
-		start_state = Object.new					#開始ステートと
-		accept_state = Object.new					#受理ステートをそれぞれ定義する．
-		rule = FARule.new(start_state, character, accept_state)		#character の文字が入力されたら開始ステートから受理ステートに遷移．
+		start_state = Object.new	#開始ステートと
+		accept_state = Object.new	#受理ステートをそれぞれ定義する．
+
+		#character の文字が入力されたら開始ステートから受理ステートに遷移．
+		rule = FARule.new(start_state, character, accept_state)
 		rulebook = NFARulebook.new([rule])
 
-		NFADesign.new(start_state, [accept_state], rulebook)		#指定した文字が入力されたなら真を返す．
+		#指定した文字が入力されたなら真を返す．
+		NFADesign.new(start_state, [accept_state], rulebook)
 	end	
 end
 
 #
-# TEST2 正規表現　を　非決定性有限オートマトン　で表現する機能を持たせる
+# TEST2 正規表現　を　非決定性有限オートマトン　で実装する
 #
 
 nfa_design = Empty.new.to_nfa_design
@@ -175,7 +196,8 @@ nfa_design.accepts?('b')
 
 module Pattern
 	def matches?(string)
-		to_nfa_design.accepts?(string)		#自動的にNFAを生成，文字列は受理されているか判定する
+		#自動的にNFAを生成，文字列は受理されているか判定する
+		to_nfa_design.accepts?(string)
 	end
 end
 
@@ -189,22 +211,31 @@ Empty.new.matches?('a')
 Literal.new('a').matches?('a')
 # TEST3-2 # true
 
-#続いて，正規表現の連結を実装する．
+#続いて，正規表現の連接を実装する．
 
 
 class Concatenate
 	def to_nfa_design
-		first_nfa_design = first.to_nfa_design						#firstとsecondのNFAをそれぞれ作成
+		#firstとsecondのNFAをそれぞれ作成
+		first_nfa_design = first.to_nfa_design
 		second_nfa_design = second.to_nfa_design
 
-		start_state = first_nfa_design.start_state					#全体の開始ステートをfirstの開始ステートにする
-		accept_states = second_nfa_design.accept_states					#全体の受理ステートをsecondの受理ステートにする
+		#全体の「開始」ステートをfirstの開始ステートにする
+		start_state = first_nfa_design.start_state		
 
-		rules = first_nfa_design.rulebook.rules + second_nfa_design.rulebook.rules	#firstとsecondの規則をまとめる
-		extra_rules = first_nfa_design.accept_states.map { |state| 			#firstの受理ステートからsecondの開始ステートへの自由移動を付加
+		#全体の「受理」ステートをsecondの受理ステートにする			
+		accept_states = second_nfa_design.accept_states
+
+		#firstとsecondの規則をまとめる
+		rules = first_nfa_design.rulebook.rules + second_nfa_design.rulebook.rules
+
+		#firstの受理ステートからsecondの開始ステートへの自由移動を付加	
+		extra_rules = first_nfa_design.accept_states.map { |state| 
 			FARule.new(state, nil, second_nfa_design.start_state) 
 		}
-		rulebook = NFARulebook.new(rules + extra_rules)					#NFAを作成
+
+		#NFAを作成
+		rulebook = NFARulebook.new(rules + extra_rules)
 
 		NFADesign.new(start_state, accept_states, rulebook)
 	end
@@ -249,17 +280,25 @@ pattern.matches?('abc')
 # TEST5-4 # true
 
 
+#続いて，正規表現の「選択」を実装する．
 
 class Choose
 	def to_nfa_design
-		first_nfa_design = first.to_nfa_design							#連接と同様
+		#firstとsecondのNFAをそれぞれ作成
+		first_nfa_design = first.to_nfa_design
 		second_nfa_design = second.to_nfa_design
 
-		start_state = Object.new								#オブジェクトを開始ステートにする
-		accept_states = first_nfa_design.accept_states + second_nfa_design.accept_states	#firstとsecondの受理ステートを全体の受理ステートにする
+		#オブジェクトを開始ステートにする
+		start_state = Object.new
 
-		rules = first_nfa_design.rulebook.rules + second_nfa_design.rulebook.rules		#firstとsecondのルールを合わせる
-		extra_rules = [first_nfa_design, second_nfa_design].map { |nfa_design| 			#全体の開始ステートからfirstとseocondの開始ステートまでの自由移動を追加
+		#firstとsecondの受理ステートを全体の受理ステートにする
+		accept_states = first_nfa_design.accept_states + second_nfa_design.accept_states
+
+		#firstとsecondのルールを合わせる
+		rules = first_nfa_design.rulebook.rules + second_nfa_design.rulebook.rules
+
+		#全体の開始ステートからfirstとseocondの開始ステートまでの自由移動を追加
+		extra_rules = [first_nfa_design, second_nfa_design].map { |nfa_design| 
 			FARule.new(start_state, nil, nfa_design.start_state)
 		}
 
@@ -270,7 +309,7 @@ class Choose
 end
 
 #
-# TEST6 正規表現の「｜(和)」を非決定性有限オートマトンで表現
+# TEST6 正規表現の「｜(選択)」を非決定性有限オートマトンで表現
 #
 
 pattern = Choose.new( Literal.new('a'), Literal.new('b') )
@@ -285,19 +324,31 @@ pattern.matches?('b')
 pattern.matches?('c')
 # TEST6-4 # false
 
+pattern.matches?('ab')
+# TEST6-5 # false
 
+
+
+#続いて，正規表現の「繰り返し」を実装する．
 
 class Repeat
 	def to_nfa_design
-		pattern_nfa_design = pattern.to_nfa_design					#連接と同様
+		# 与えられた正規表現のNFAを生成
+		pattern_nfa_design = pattern.to_nfa_design
 
-		start_state = Object.new							#開始ステートをオブジェクトとして定義
-		accept_states = pattern_nfa_design.accept_states + [start_state]		#受理ステートを内部の受理ステートと開始ステートにする
+		#オブジェクトを開始ステートにする
+		start_state = Object.new
 
-		rules = pattern_nfa_design.rulebook.rules					#内部の規則を全体の規則として追加
+		#受理ステートを内部の受理ステートと開始ステートにする
+		accept_states = pattern_nfa_design.accept_states + [start_state]
 
-		extra_rules = 									#patternの受理ステートからpatternの開始ステートへの自由移動を追加
-			pattern_nfa_design.accept_states.map { |accept_state| 			#全体の開始ステートからpatternの開始ステートへの自由移動を追加
+		#内部の規則を全体の規則として追加
+		rules = pattern_nfa_design.rulebook.rules
+
+		#patternの受理ステートからpatternの開始ステートへの自由移動を追加
+		extra_rules = 	
+			#全体の開始ステートからpatternの開始ステートへの自由移動を追加
+			pattern_nfa_design.accept_states.map { |accept_state| 
 				FARule.new(accept_state, nil, pattern_nfa_design.start_state)
 			} +
 			[FARule.new(start_state, nil, pattern_nfa_design.start_state)]
@@ -309,7 +360,7 @@ class Repeat
 end
 
 #
-# TEST7 正規表現の「*(閉包)」を非決定性有限オートマトンで表現
+# TEST7 正規表現の「*(繰り返し)」を非決定性有限オートマトンで表現
 #
 
 pattern = Repeat.new( Literal.new('a') )
@@ -341,6 +392,7 @@ pattern =
 		)
 	)
 # TEST8-1 #　/(a(|b))*/
+# ("a"もしくは"ab")の繰り返し
 
 pattern.matches?('')
 # TEST8-2 #　true
@@ -359,6 +411,8 @@ pattern.matches?('abaab')
 
 pattern.matches?('abba')
 # TEST8-7 #　false
+
+
 
 # 正規表現をつくるとき、いちいちRubyを書くのはめんどくさい
 # →パーサに任せよう！→Treetopを使おう！
@@ -385,4 +439,3 @@ pattern.matches?('abaab')
 
 pattern.matches?('abba')
 # TEST9-3 # false
->>>>>>> 7cca11989ad2776c5842c62f131f0e4dfaf8dfe3
