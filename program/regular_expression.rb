@@ -360,4 +360,29 @@ pattern.matches?('abaab')
 pattern.matches?('abba')
 # TEST8-7 #　false
 
+# 正規表現をつくるとき、いちいちRubyを書くのはめんどくさい
+# →パーサに任せよう！→Treetopを使おう！
 
+# 手順１　treetopを読み込む
+require "treetop"
+
+# 手順2　treetopのための文法PEGで書かれた、.treetopファイルをロードする
+Treetop.load('pattern')
+
+# 手順３　正規表現をパーサにかけよう
+parse_tree = PatternParser.new.parse('(a(|b))*')
+
+
+#
+# TEST9 パーサによってRubyコードに書き換えた正規表現は、ちゃんと動くか？
+#
+
+pattern = parse_tree.to_ast
+# TEST9-1 #　/(a(|b))*/
+
+pattern.matches?('abaab')
+# TEST9-2 #　true
+
+pattern.matches?('abba')
+# TEST9-3 # false
+>>>>>>> 7cca11989ad2776c5842c62f131f0e4dfaf8dfe3
