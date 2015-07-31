@@ -1,6 +1,6 @@
 #　決定性プッシュダウンオートマトンのシミュレーション
 
-# require "./regular_expression.rb" 
+require "./Equivalence.rb" 
 
 class Stack < Struct.new(:contents)
 	def push(character)
