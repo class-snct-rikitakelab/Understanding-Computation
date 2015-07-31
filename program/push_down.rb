@@ -16,7 +16,7 @@ class Stack < Struct.new(:contents)
 	end
 
 	def inspect
-		"#<Stack {#{top}}#{contents.drop(1).join}>"
+		"#<Stack (#{top})#{contents.drop(1).join}>"
 	end
 end
 
@@ -162,7 +162,7 @@ dpda.accepting?
 dpda.read_string('(()'); dpda.accepting?
 # false
 
-data.current_configuration
+dpda.current_configuration
 # #<struct PDAConfiguration state=2, stack=#<Stack (b)$>>
 
 
