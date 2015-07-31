@@ -1,4 +1,3 @@
-
 #正規表現
 
 #	正規表現：文字列に対して条件がマッチしているかどうか判定するための記法
@@ -297,7 +296,7 @@ class Choose
 		#firstとsecondのルールを合わせる
 		rules = first_nfa_design.rulebook.rules + second_nfa_design.rulebook.rules
 
-		#全体の開始ステートからfirstとseocondの開始ステートまでの自由移動を追加
+		#全体の開始ステートからfirstとsecondの開始ステートまでの自由移動を追加
 		extra_rules = [first_nfa_design, second_nfa_design].map { |nfa_design| 
 			FARule.new(start_state, nil, nfa_design.start_state)
 		}
@@ -378,6 +377,9 @@ pattern.matches?('aaaa')
 pattern.matches?('b')
 # TEST7-4 # false
 
+pattern.matches?('abaa')
+# TEST7-5 # false
+
 
 
 #
@@ -439,3 +441,7 @@ pattern.matches?('abaab')
 
 pattern.matches?('abba')
 # TEST9-3 # false
+
+pattern.matches?(nil)
+# TEST9-4 # false
+# 型エラー
