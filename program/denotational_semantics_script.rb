@@ -222,6 +222,7 @@ proc.call( environment )
 #
 
 
+<<<<<<< HEAD
 
 # 文
 # 操作的意味論では文は新しい値というより新しい環境を作るものだった
@@ -233,11 +234,28 @@ class Assign
 	def to_ruby
 		"-> e { e.merge({ #{name.inspect} => (#{expression.to_ruby}).call(e) }) }"
 	end
+=======
+# 文
+# 操作的意味論では文は新しい値というより新しい環境を作るものだった
+# →表示的意味論で実現しよう
+#
+# Assignのto_rubyメソッドは更新された環境のハッシュが結果となるprocを作る必要
+
+class Assign
+        def to_ruby
+                "-> e { e.merge({ #{name.inspect} => (#{expression.to_ruby}).call(e) }) }"
+        end
+>>>>>>> b2f454196b9c65241163171537499bd15254ed87
 end
 
 # Assignの確認
 statement = Assign.new(:y, Add.new(Variable.new(:x), Number.new(1)))
+<<<<<<< HEAD
 # => «y = x + 1»
+=======
+
+# => ≪y = x + 1≫
+>>>>>>> b2f454196b9c65241163171537499bd15254ed87
 
 statement.to_ruby
 # => "-> e { e.merge({ :y => (-> e { (-> e { e[:x] }).call(e) + (-> e { 1 }).call(e) }).call(e) }) }"
@@ -249,6 +267,7 @@ proc = eval(statement.to_ruby)
 proc.call({ x: 3 })
 # => {:x=>3, :y=>4}
 
+<<<<<<< HEAD
 # DoNothingはここでも簡単
 
 class DoNothing
@@ -271,10 +290,43 @@ class If
 	end
 end
 
+=======
+
+
+
+# DoNothingはここでも簡単
+
+class DoNothing
+        def to_ruby
+                '-> e { e }'
+        end
+end
+
+
+
+
+# if文では
+# ≪if(...) {...} else(...) {...}≫をRubyのif ... then ... else ... end
+# の形に翻訳する。
+#
+class If
+        def to_ruby
+                "-> e { if (#{condition.to_ruby}).call(e)" +
+                " then (#{consequence.to_ruby}).call(e)" +
+                " else (#{alternative.to_ruby}).call(e)" +
+                " end }"
+        end
+end
+
+
+
+
+>>>>>>> b2f454196b9c65241163171537499bd15254ed87
 # ビッグステップ意味論ではシーケンス分は
 # 一つ目の文の評価結果が二つ目の文の評価のための環境として
 # 使われてたのでそのように
 class Sequence
+<<<<<<< HEAD
 	def to_ruby
 		"-> e { (#{second.to_ruby}).call((#{first.to_ruby}).call(e)) }"
 	end
@@ -291,15 +343,51 @@ class While
 	end
 end
 
+=======
+        def to_ruby
+                "-> e { (#{second.to_ruby}).call((#{first.to_ruby}).call(e)) }"
+        end
+end
+
+
+
+
+# while文をRubyのwhileを使ったprocに翻訳する。
+# これは再帰的にbodyを実行して最終的な環境を返す。
+class While
+        def to_ruby
+                "-> e {" +
+                " while (#{condition.to_ruby}).call(e); e = (#{body.to_ruby}).call(e); end;" +
+                " e" +
+                " }"
+        end
+end
+
+
+
+>>>>>>> b2f454196b9c65241163171537499bd15254ed87
 # 簡単なwhile文も非常にくどくなることを確かめる
 statement =
 While.new(
 LessThan.new(Variable.new(:x), Number.new(5)),
 Assign.new(:x, Multiply.new(Variable.new(:x), Number.new(3)))
 )
+<<<<<<< HEAD
 # => «while (x < 5) { x = x * 3 }»
 statement.to_ruby
 # => "-> e { while (-> e { ( -> e { e[ :x ] } ).call(e) < ( -> e { 5 } ).call(e) }).call(e); e = (-> e { e.merge({ :x => (-> e { ( -> e { e[ :x ] } ).call(e) * ( -> e { 3 } ).call(e) }).call(e) }) }).call(e); en
 proc = eval(statement.to_ruby)
 # => #<Proc:0x007fe457af4040@(eval):1 (lambda)>
 proc.call({ x: 1 })
+=======
+# => ≪while (x < 5) { x = x * 3 }≫
+
+statement.to_ruby
+# => "-> e { while (-> e { ( -> e { e[ :x ] } ).call(e) < ( -> e { 5 } ).call(e) }).call(e); e = (-> e { e.merge({ :x => (-> e { ( -> e { e[ :x ] } ).call(e) * ( -> e { 3 } ).call(e) }).call(e) }) }).call(e); en
+
+proc = eval(statement.to_ruby)
+# => #<Proc:0x007fe457af4040@(eval):1 (lambda)>
+
+proc.call({ x: 1 })
+# => {:x=>9}
+>>>>>>> b2f454196b9c65241163171537499bd15254ed87
