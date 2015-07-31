@@ -97,6 +97,8 @@ stack = stack.pop; stack.pop
 stack = stack.pop; stack.top
 # "x"
 
+configuration = PDAConfiguration.new(1, Stack.new(['$']))
+
 rule.follow(configuration)
 # #<struct PDAConfiguration state=2, stack=#<Stack (b)$>>
 
@@ -250,7 +252,7 @@ dpda_design.accepts?('()(())((()))(()(()))')
 dpda_design.accepts?('(()(()(()()(()()))()')
 # false
 
-dpda_design.accepts?('(()')
+dpda_design.accepts?('())')
 # NoMethodError: ...
 
 
@@ -269,7 +271,7 @@ end
 
 class DPDA
 	def next_configuration(character)
-		if rulebook.applies_to?(current_configuration, bottom_character)
+		if rulebook.applies_to?(current_configuration, character)
 			rulebook.next_configuration(current_configuration, character)
 		else
 			current_configuration.stuck
