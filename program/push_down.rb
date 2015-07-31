@@ -67,6 +67,8 @@ configuration = PDAConfiguration.new(1, Stack.new(['$']))
 rule.applies_to?(configuration, '(')
 # true
 
+
+
 class PDARule
 	def follow(configuration)
 		PDAConfiguration.new(next_state, next_stack(configuration))
@@ -106,7 +108,7 @@ class DPDARulebook < Struct.new(:rules)
 	end
 
 	def rule_for(configuration, character)
-		rules.detect { |rule| rule.applies_to?(configuration)}
+		rules.detect { |rule| rule.applies_to?(configuration, character)}
 	end
 end
 
