@@ -45,7 +45,8 @@ class Empty						#空の正規表現を実装
 		''
 	end
 
-	def precedence					#空の正規表現の優先度は3
+	def precedence	
+					#空の正規表現の優先度は3
 		3
 	end
 end
@@ -419,29 +420,31 @@ pattern.matches?('abba')
 # 正規表現をつくるとき、いちいちRubyを書くのはめんどくさい
 # →パーサに任せよう！→Treetopを使おう！
 
-# 手順１　treetopを読み込む
-require "treetop"
 
-# 手順2　treetopのための文法PEGで書かれた、.treetopファイルをロードする
-Treetop.load('pattern')
-
-# 手順３　正規表現をパーサにかけよう
-parse_tree = PatternParser.new.parse('(a(|b))*')
-
-
+## 手順１　treetopを読み込む
+#require "treetop"
 #
-# TEST9 パーサによってRubyコードに書き換えた正規表現は、ちゃんと動くか？
+## 手順2　treetopのための文法PEGで書かれた、.treetopファイルをロードする
+#Treetop.load('pattern')
 #
-
-pattern = parse_tree.to_ast
-# TEST9-1 #　/(a(|b))*/
-
-pattern.matches?('abaab')
-# TEST9-2 #　true
-
-pattern.matches?('abba')
-# TEST9-3 # false
-
-pattern.matches?(nil)
-# TEST9-4 # false
-# 型エラー
+## 手順３　正規表現をパーサにかけよう
+#parse_tree = PatternParser.new.parse('(a(|b))*')
+#
+#
+##
+## TEST9 パーサによってRubyコードに書き換えた正規表現は、ちゃんと動くか？
+##
+#
+#pattern = parse_tree.to_ast
+## TEST9-1 #　/(a(|b))*/
+#
+#pattern.matches?('abaab')
+## TEST9-2 #　true
+#
+#pattern.matches?('abba')
+## TEST9-3 # false
+#
+#pattern.matches?(nil)
+## TEST9-4 # false
+## 型エラー
+#
